@@ -319,3 +319,27 @@ answerEl.addEventListener("keydown", e => {
 // ==================== Init ====================
 setHudLevel(0);
 showIndovinello();
+async function testOpenAI() {
+  const apiKey = localStorage.getItem("OPENAI_API_KEY");
+  console.log("API key:", apiKey);
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "user", content: "Ciao, funziona?" }
+      ],
+      max_tokens: 3
+    })
+  });
+  console.log(res.status);
+  const data = await res.json();
+  console.log(data);
+}
+testOpenAI();
+
+
