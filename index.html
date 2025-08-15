@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Addeo Studios Mystery</title>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+  <header>
+    <div class="logo-container">
+      <img src="logo.png" alt="Logo Addeo Studios" class="logo"/>
+      <span class="studio-text">Addeo Studios Mystery</span>
+    </div>
+  </header>
+
+  <div class="center-container">
+    <div id="indovinello"></div>
+    <div id="difficulty"></div>
+    <div id="progress-container">
+      <div id="progress-bar"></div>
+    </div>
+    <div class="input-container">
+      <div id="strike-hud" class="level-0" aria-live="polite" aria-label="Errori">
+        <span class="flame-icon" role="img" aria-label="Fuoco">🔥</span>
+        <span class="strike-count" id="strike-count">0</span>
+      </div>
+      <input type="text" id="answer" placeholder="Scrivi la tua risposta..." autocomplete="off"/>
+      <button id="submit" aria-label="Invia risposta">→</button>
+    </div>
+  </div>
+
+  <!-- Onda/pulsazione a schermo -->
+  <div id="wave"></div>
+
+  <!-- Particelle di contorno -->
+  <canvas id="particles"></canvas>
+
+  <script src="script.js"></script>
+</body>
+</html>

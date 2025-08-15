@@ -1,0 +1,238 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+:root{
+  --bg:#000; --fg:#fff;
+  --accent:#00c853;
+  --danger:#d50000;
+
+  --glow: rgba(0,200,83,.55);
+  --badge1: rgba(0,200,83,.25);
+  --badge2: rgba(0,200,83,.15);
+  --border: rgba(0,200,83,.35);
+}
+
+*{ box-sizing:border-box; }
+
+body {
+  margin: 0; padding: 0;
+  font-family: 'Poppins', sans-serif;
+  background: linear-gradient(160deg, #16101E, #1a1a24);
+  color: var(--fg);
+  height: 100vh;
+  overflow: hidden;
+  display: flex; flex-direction: column;
+}
+
+/* --- HEADER --- */
+header{
+  width:100%; 
+  padding:10px 20px;
+  position:fixed; top:0; left:0; z-index:10;
+  background: transparent;
+  display:flex; 
+  align-items:center;
+}
+
+.logo-container{
+  display:flex; 
+  align-items:center; 
+  gap:12px;
+}
+
+.logo{
+  width:50px; 
+  height:50px; 
+  object-fit:contain;
+}
+
+.studio-text{
+  font-weight:600; 
+  font-size:22px; 
+  color:#fff;
+  text-shadow: 0 2px 6px rgba(0,0,0,0.4);
+}
+
+/* --- CONTENITORE CENTRALE --- */
+.center-container{
+  flex:1; display:flex; flex-direction:column;
+  justify-content:center; align-items:center;
+  padding:100px 16px 16px;
+}
+
+#indovinello{
+  font-size:clamp(20px, 4vw, 32px); 
+  margin-bottom:10px; text-align:center;
+  max-width:90%; display:inline-block; line-height:1.45;
+  word-spacing:clamp(4px, 1vw, 10px);
+  transition: opacity 0.5s ease;
+}
+
+#difficulty{
+  font-size:clamp(14px,2vw,18px); margin-bottom:20px; color:#fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+
+/* --- BARRA PROGRESSO --- */
+#progress-container{
+  width:80%; max-width:600px; height:8px; background: rgba(255,255,255,0.1);
+  border-radius:4px; overflow:hidden; margin-bottom:30px;
+}
+#progress-bar{
+  height:100%; width:0; background: var(--accent); transition: width 0.3s ease;
+}
+
+/* Animazione “onda” sulle lettere */
+@keyframes waveText{
+  0%,100%{ transform:translateY(0); }
+  50%{ transform:translateY(-8px); }
+}
+.letter{ display:inline-block; animation:waveText 2s ease-in-out infinite; }
+
+/* --- STRIKE, INPUT E PULSANTE INVIO --- */
+.input-container{
+  display:flex; align-items:center; gap:10px;
+  width:100%; max-width:500px;
+  flex-wrap:nowrap; /* sempre affiancati */
+  justify-content:center;
+}
+
+#strike-hud{
+  display:flex; flex-direction:column; align-items:center;
+  position:relative; 
+  font-size:0;
+  user-select:none;
+  margin-bottom:0;
+}
+
+.flame-icon{
+  font-size:clamp(30px,5vw,40px); display:inline-block;
+  animation:flicker .9s infinite ease-in-out alternate;
+  filter: drop-shadow(0 0 10px var(--glow));
+  position:relative;
+}
+
+.strike-count{
+  font-weight:700; font-size:clamp(12px,2vw,16px); 
+  color:#fff; text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  position:absolute; bottom:-6px; right:-6px;
+}
+
+/* CASCELLA DI TESTO */
+input[type="text"]{
+  flex:1;
+  min-width:180px;
+  max-width:320px;
+  padding:12px 18px;
+  font-size:16px;
+  border-radius:24px;
+  border:1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.08);
+  color:#fff;
+  outline:none;
+  box-shadow:0 4px 12px rgba(0,0,0,0.25);
+  transition: all 0.3s ease, box-shadow 0.4s ease;
+}
+input[type="text"]:focus{
+  background: rgba(255,255,255,0.18);
+  box-shadow: 0 6px 20px rgba(0,200,83,0.4);
+  border-color: var(--accent);
+  transform: scale(1.02);
+}
+
+/* PULSANTE INVIO */
+button{
+  width:50px; height:50px; font-size:24px; border-radius:50%; border:none;
+  background: var(--accent); color:#fff; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  transition: all 0.3s ease;
+}
+button:hover{
+  transform: scale(1.15) rotate(8deg);
+  box-shadow:0 7px 24px rgba(0,200,83,0.55);
+  background: #00e664;
+}
+button:active{
+  transform: scale(1.05) rotate(0deg);
+  box-shadow:0 4px 14px rgba(0,200,83,0.4);
+}
+
+/* Onda/pulsazione a schermo */
+#wave{
+  position:fixed; top:50%; left:50%; width:0; height:0;
+  border-radius:50%; pointer-events:none; transform:translate(-50%,-50%);
+  opacity:0; z-index:999;
+}
+.wave-show{ animation:waveAnim 1s ease-out forwards; }
+@keyframes waveAnim{
+  0%   { width:0; height:0; opacity:.75; filter:blur(8px);}
+  45%  { width:150vw; height:150vw; opacity:.45; filter:blur(14px);}
+  100% { width:320vw; height:320vw; opacity:0; filter:blur(24px);}
+}
+
+/* HUD Livelli colore */
+#strike-hud.level-0{ --glow:rgba(0,200,83,.55); }
+#strike-hud.level-1{ --glow:rgba(255,193,7,.6); }
+#strike-hud.level-2{ --glow:rgba(255,145,0,.65); }
+#strike-hud.level-3{ --glow:rgba(255,82,82,.7); }
+#strike-hud.level-4{ --glow:rgba(255,23,68,.75); }
+
+/* Micro “punch” */
+.punch{ animation:punch .28s ease-out; }
+@keyframes punch{
+  0%{ transform:scale(1); }
+  40%{ transform:scale(1.12); }
+  100%{ transform:scale(1); }
+}
+
+/* Burst e scintille */
+.burst{
+  position:fixed; font-size:28px; pointer-events:none; z-index:1200;
+  animation:burstUp 900ms ease-out forwards;
+  filter: drop-shadow(0 0 8px rgba(255,140,0,.8));
+}
+@keyframes burstUp{
+  0%   { transform:translate(-50%,-50%) scale(.7) rotate(0deg); opacity:0; }
+  20%  { opacity:1; }
+  70%  { transform:translate(-50%,-120%) scale(1.25) rotate(-12deg); opacity:.9; }
+  100% { transform:translate(-50%,-180%) scale(.9) rotate(8deg); opacity:0; }
+}
+.spark{
+  position:fixed; width:6px; height:6px; border-radius:50%;
+  background: radial-gradient(circle, #fff 0%, #ffc400 60%, transparent 100%);
+  pointer-events:none; z-index:1199; opacity:0;
+  animation:sparkFly 700ms ease-out forwards;
+}
+@keyframes sparkFly{
+  0%   { opacity:0; transform:translate(-50%,-50%) scale(.6); }
+  15%  { opacity:1; }
+  100% { opacity:0; transform:translate(var(--dx), var(--dy)) scale(.2); }
+}
+
+/* Particelle canvas */
+#particles{
+  position:fixed; bottom:0; left:0; width:100%; height:100%;
+  pointer-events:none; z-index:1;
+  transition: transform 0.1s ease-out;
+}
+
+/* ----------------- Responsive ----------------- */
+@media (max-width:1024px){
+  .center-container{ padding:90px 16px 16px; }
+  #progress-container{ width:90%; }
+  .input-container{ max-width:450px; gap:8px; }
+}
+
+@media (max-width:768px){
+  #indovinello{ font-size:clamp(18px,5vw,28px); word-spacing:6px; }
+  #difficulty{ font-size:clamp(12px,2.5vw,16px); }
+  .input-container{ flex-wrap:nowrap; gap:6px; }
+  input[type="text"]{ padding:10px 14px; font-size:14px; }
+  button{ width:40px; height:40px; font-size:18px; }
+}
+
+@media (max-width:480px){
+  #indovinello{ font-size:clamp(16px,6vw,24px); word-spacing:4px; }
+  #difficulty{ font-size:clamp(11px,3vw,14px); }
+  input[type="text"]{ padding:8px 12px; font-size:13px; }
+  button{ width:35px; height:35px; font-size:16px; }
+}
