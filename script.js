@@ -67,6 +67,8 @@ const shuffledIndovinelli = shuffleArray([...indovinelli]);
 let current = 0;
 let strikeCount = 0;
 let isProcessing = false;
+const debounceTime = 500; // ms
+let debounceTimeout = null;
 
 const indovinelloEl = document.getElementById("indovinello");
 const answerEl      = document.getElementById("answer");
@@ -237,10 +239,11 @@ function addStrike(){
   }
 }
 
-// ==================== Funzione AI: verifica risposta ====================
-async function isAnswerCorrectAI(question, userAnswer, correctAnswer) {
+// ==================== Funzione AI con gestione 429 ====================
+async function isAnswerCorrectAI(question, userAnswer, correctAnswer, retries = 3) {
   const apiKey = localStorage.getItem("OPENAI_API_KEY");
-  if (!apiKey) return false;
+  if (!apiKey) throw new Error("Chiave OpenAI non trovata in localStorage");
+
   try {
     const res = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
@@ -251,48 +254,57 @@ async function isAnswerCorrectAI(question, userAnswer, correctAnswer) {
       body: JSON.stringify({
         model: "gpt-4o-mini",
         messages: [
-          { role: "system", content: "Sei un valutatore di risposte per un gioco di indovinelli. Rispondi solo con SI o NO. Accetta risposte equivalenti alla corretta (es. H2O = acqua)." },
+          { role: "system", content: "Sei un valutatore di risposte per un gioco di indovinelli. Rispondi solo con SI o NO." },
           { role: "user", content: `Domanda: ${question}\nRisposta utente: ${userAnswer}\nRisposta corretta: ${correctAnswer}` }
         ],
         max_tokens: 3,
         temperature: 0
       })
     });
+
+    if (res.status === 429 && retries > 0) {
+      await new Promise(r => setTimeout(r, 1500));
+      return await isAnswerCorrectAI(question, userAnswer, correctAnswer, retries - 1);
+    }
+
     const data = await res.json();
     const answer = data.choices?.[0]?.message?.content?.trim().toLowerCase() || "";
     return answer.startsWith("si");
   } catch(e) {
-    console.error("Errore API:", e);
+    console.error(e);
     return false;
   }
 }
 
-// ==================== Controllo risposta con AI ====================
+// ==================== Controllo risposta con debounce ====================
 async function checkAnswer(){
   if (isProcessing) return;
   const userRaw = answerEl.value;
   if (!userRaw.trim()) return;
 
-  const { q: question, a: correctAnswer } = shuffledIndovinelli[current];
-  isProcessing = true;
+  if (debounceTimeout) clearTimeout(debounceTimeout);
+  debounceTimeout = setTimeout(async () => {
+    const { q: question, a: correctAnswer } = shuffledIndovinelli[current];
+    isProcessing = true;
 
-  const isCorrect = await isAnswerCorrectAI(question, userRaw, correctAnswer);
+    const isCorrect = await isAnswerCorrectAI(question, userRaw, correctAnswer);
 
-  if (isCorrect) {
-    triggerWave("#00c853");
-    addStrike();
-    setTimeout(() => {
-      current++;
-      showIndovinello();
+    if (isCorrect) {
+      triggerWave("#00c853");
+      addStrike();
+      setTimeout(() => {
+        current++;
+        showIndovinello();
+        isProcessing = false;
+      }, 600);
+    } else {
+      triggerWave("#d50000");
+      strikeCount = 0;
+      strikeCountEl.textContent = strikeCount;
+      setHudLevel(strikeCount);
       isProcessing = false;
-    }, 600);
-  } else {
-    triggerWave("#d50000");
-    strikeCount = 0;
-    strikeCountEl.textContent = strikeCount;
-    setHudLevel(strikeCount);
-    isProcessing = false;
-  }
+    }
+  }, debounceTime);
 }
 
 // ==================== Eventi ====================
