@@ -10,7 +10,47 @@ const indovinelli = [
   { q:"Non puoi toccarlo, ma lo senti. Cos'è?", a:"il vento", difficulty:"Facile" },
   { q:"Cosa diventa più leggero se lo metti in acqua?", a:"il ghiaccio", difficulty:"Facile" },
   { q:"Quale parola è scritta sempre sbagliata?", a:"sbagliata", difficulty:"Media" },
-  // ... inserisci qui tutti gli altri indovinelli ...
+  { q:"Sono pieno di buchi ma trattengo l’acqua. Cosa sono?", a:"la spugna", difficulty:"Media" },
+  { q:"Se mi nomini, scompaio. Cosa sono?", a:"il silenzio", difficulty:"Facile" },
+  { q:"Quale cosa ha un occhio ma non può vedere?", a:"l’ago", difficulty:"Facile" },
+  { q:"Ha città senza case, fiumi senza acqua, foreste senza alberi. Cos’è?", a:"la mappa", difficulty:"Difficile" },
+  { q:"Cosa sale ma non scende mai?", a:"l’età", difficulty:"Facile" },
+  { q:"Qual è l’unico mese con 28 giorni almeno una volta l’anno?", a:"tutti", difficulty:"Facile" },
+  { q:"Quale parola è lunga solo una lettera?", a:"I", difficulty:"Difficile" },
+  { q:"Vivo senza respirare, dormo senza chiudere gli occhi. Chi sono?", a:"il pesce", difficulty:"Media" },
+  { q:"Cosa ha mani ma non può battere?", a:"l’orologio", difficulty:"Facile" },
+  { q:"Cosa diventa più bagnata man mano che si asciuga?", a:"l’asciugamano", difficulty:"Media" },
+  { q:"Ha denti ma non mangia. Cos’è?", a:"il pettine", difficulty:"Facile" },
+  { q:"Sono leggero come una piuma, ma nemmeno il più forte può tenermi per più di un minuto. Cosa sono?", a:"il respiro", difficulty:"Difficile" },
+  { q:"Cosa ha una chiave ma non apre nessuna porta?", a:"il pianoforte", difficulty:"Facile" },
+  { q:"Cammina senza gambe. Cos’è?", a:"il tempo", difficulty:"Difficile" },
+  { q:"Cosa ha molti occhi ma non può vedere?", a:"il dado", difficulty:"Media" },
+  { q:"Quale numero manca in questa sequenza? 1,4,9,16, ?", a:"25", difficulty:"Difficile" },
+  { q:"Se ne togli uno, diventa più grande. Cos’è?", a:"una buca", difficulty:"Facile" },
+  { q:"Cos’è pieno di lettere ma non può leggere?", a:"la cassetta postale", difficulty:"Facile" },
+  { q:"Cosa ha un collo ma nessuna testa?", a:"la bottiglia", difficulty:"Media" },
+  { q:"Quale animale porta la sua casa sulla schiena?", a:"la tartaruga", difficulty:"Facile" },
+  { q:"Cosa cresce ma non vive?", a:"l’ombra", difficulty:"Difficile" },
+  { q:"Cosa corre ma non ha gambe?", a:"l’acqua", difficulty:"Media" },
+  { q:"Ha una lingua ma non parla. Cos’è?", a:"la scarpa", difficulty:"Facile" },
+  { q:"Più togli, più diventa grande. Cos’è?", a:"una buca", difficulty:"Facile" },
+  { q:"Quale cosa appartiene a te ma viene usata più dagli altri?", a:"il nome", difficulty:"Media" },
+  { q:"Ha chiavi ma non può aprire porte. Cos’è?", a:"il pianoforte", difficulty:"Facile" },
+  { q:"Cosa può essere rotto senza essere toccato?", a:"la promessa", difficulty:"Facile" },
+  { q:"Cos’è che può correre ma non cammina, ha una bocca ma non parla?", a:"il fiume", difficulty:"Media" },
+  { q:"Quale parola è scritta uguale al contrario?", a:"radar", difficulty:"Difficile" },
+  { q:"Cosa diventa più corta se aggiungi qualcosa?", a:"il buco", difficulty:"Difficile" },
+  { q:"Ha mani ma non può battere. Cos’è?", a:"l’orologio", difficulty:"Facile" },
+  { q:"Quale cosa puoi tenere in mano ma mai toccare?", a:"il respiro", difficulty:"Difficile" },
+  { q:"Sono sempre davanti a te ma non puoi vedermi. Cos’è?", a:"il futuro", difficulty:"Media" },
+  { q:"Più ne prendi, più lasci indietro. Cos’è?", a:"i passi", difficulty:"Facile" },
+  { q:"Ha un letto ma non dorme mai. Cos’è?", a:"il fiume", difficulty:"Media" },
+  { q:"Cosa ha radici che nessuno vede, cresce senza acqua, e mai muore?", a:"la montagna", difficulty:"Difficile" },
+  { q:"Cosa ha una coda ma non un corpo?", a:"la moneta", difficulty:"Facile" },
+  { q:"Cosa è sempre in movimento ma non cammina?", a:"il tempo", difficulty:"Media" },
+  { q:"Quale cosa si rompe se la nomini?", a:"il silenzio", difficulty:"Facile" },
+  { q:"Ha molte foglie ma non è un albero. Cos’è?", a:"il libro", difficulty:"Facile" },
+  { q:"Cosa cammina sulla terra ma dorme nel cielo?", a:"la stella cadente", difficulty:"Difficile" }
 ];
 
 // ==================== Mischia casuale ====================
@@ -21,14 +61,13 @@ function shuffleArray(array){
   }
   return array;
 }
+
 const shuffledIndovinelli = shuffleArray([...indovinelli]);
 
 // ==================== DOM ====================
 let current = 0;
 let strikeCount = 0;
 let isProcessing = false;
-const debounceTime = 500;
-let debounceTimeout = null;
 
 const indovinelloEl = document.getElementById("indovinello");
 const answerEl      = document.getElementById("answer");
@@ -124,6 +163,7 @@ class Particle{
     ctx.fill();
   }
 }
+
 for (let i=0;i<particleCount;i++) particlesArray.push(new Particle());
 
 function animateParticles(){
@@ -141,7 +181,7 @@ window.addEventListener('resize', ()=>{
   canvas.height = window.innerHeight;
 });
 
-// ==================== Wave trigger ====================
+// ==================== Wave trigger con colore particelle ====================
 function triggerWave(color){
   waveEl.style.backgroundColor = color;
   waveEl.classList.remove("wave-show");
@@ -186,7 +226,7 @@ function addStrike(){
     const spark = document.createElement('span');
     spark.className = 'spark';
     spark.style.left = `${rect.left + 28}px`;
-    spark.style.top  = `${rect.top + 18}px`;
+    spark.style.top  = `${rect.top  + 18}px`;
     const angle = Math.random()*Math.PI*2;
     const dist  = 40 + Math.random()*60;
     const dx = Math.cos(angle)*dist;
@@ -199,35 +239,31 @@ function addStrike(){
   }
 }
 
-// ==================== Controllo risposta gratuito ====================
+// ==================== Controllo risposta ====================
 function checkAnswer(){
   if (isProcessing) return;
   const userRaw = answerEl.value;
-  if (!userRaw.trim()) return;
+  const userAns = normalize(userRaw);
+  if (!userAns) return;
 
-  if (debounceTimeout) clearTimeout(debounceTimeout);
-  debounceTimeout = setTimeout(() => {
-    const { q: question, a: correctAnswer } = shuffledIndovinelli[current];
-    isProcessing = true;
+  const corrAns = normalize(shuffledIndovinelli[current].a);
+  isProcessing = true;
 
-    const isCorrect = normalize(userRaw) === normalize(correctAnswer);
-
-    if (isCorrect) {
-      triggerWave("#00c853");
-      addStrike();
-      setTimeout(() => {
-        current++;
-        showIndovinello();
-        isProcessing = false;
-      }, 600);
-    } else {
-      triggerWave("#d50000");
-      strikeCount = 0;
-      strikeCountEl.textContent = strikeCount;
-      setHudLevel(strikeCount);
+  if (userAns === corrAns){
+    triggerWave("#00c853"); // verde
+    addStrike();
+    setTimeout(() => {
+      current++;
+      showIndovinello();
       isProcessing = false;
-    }
-  }, debounceTime);
+    }, 600);
+  } else {
+    triggerWave("#d50000"); // rosso
+    strikeCount = 0;
+    strikeCountEl.textContent = strikeCount;
+    setHudLevel(strikeCount);
+    isProcessing = false;
+  }
 }
 
 // ==================== Eventi ====================
