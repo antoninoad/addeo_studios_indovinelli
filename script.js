@@ -52,6 +52,7 @@ const indovinelli = [
   { q:"Ha molte foglie ma non è un albero. Cos’è?", a:"il libro", difficulty:"Facile" },
   { q:"Cosa cammina sulla terra ma dorme nel cielo?", a:"la stella cadente", difficulty:"Difficile" }
 ];
+
 // ==================== Mischia casuale ====================
 function shuffleArray(array){
   for(let i=array.length-1;i>0;i--){
@@ -239,25 +240,31 @@ function addStrike(){
 // ==================== Funzione AI: verifica risposta ====================
 async function isAnswerCorrectAI(question, userAnswer, correctAnswer) {
   const apiKey = localStorage.getItem("OPENAI_API_KEY");
-  const res = await fetch("https://api.openai.com/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${apiKey}`
-    },
-    body: JSON.stringify({
-      model: "gpt-4o-mini",
-      messages: [
-        { role: "system", content: "Sei un valutatore di risposte per un gioco di indovinelli. Rispondi solo con SI o NO, niente punti o parole extra." },
-        { role: "user", content: `Domanda: ${question}\nRisposta utente: ${userAnswer}\nRisposta corretta: ${correctAnswer}` }
-      ],
-      max_tokens: 3,
-      temperature: 0
-    })
-  });
-  const data = await res.json();
-  const answer = data.choices?.[0]?.message?.content?.trim().toLowerCase() || "";
-  return answer.startsWith("si");
+  if (!apiKey) return false;
+  try {
+    const res = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages: [
+          { role: "system", content: "Sei un valutatore di risposte per un gioco di indovinelli. Rispondi solo con SI o NO. Accetta risposte equivalenti alla corretta (es. H2O = acqua)." },
+          { role: "user", content: `Domanda: ${question}\nRisposta utente: ${userAnswer}\nRisposta corretta: ${correctAnswer}` }
+        ],
+        max_tokens: 3,
+        temperature: 0
+      })
+    });
+    const data = await res.json();
+    const answer = data.choices?.[0]?.message?.content?.trim().toLowerCase() || "";
+    return answer.startsWith("si");
+  } catch(e) {
+    console.error("Errore API:", e);
+    return false;
+  }
 }
 
 // ==================== Controllo risposta con AI ====================
