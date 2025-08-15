@@ -52,7 +52,6 @@ const indovinelli = [
   { q:"Ha molte foglie ma non è un albero. Cos’è?", a:"il libro", difficulty:"Facile" },
   { q:"Cosa cammina sulla terra ma dorme nel cielo?", a:"la stella cadente", difficulty:"Difficile" }
 ];
-
 // ==================== Mischia casuale ====================
 function shuffleArray(array){
   for(let i=array.length-1;i>0;i--){
@@ -224,7 +223,7 @@ function addStrike(){
     const spark = document.createElement('span');
     spark.className = 'spark';
     spark.style.left = `${rect.left + 28}px`;
-    spark.style.top  = `${rect.top  + 18}px`;
+    spark.style.top  = `${rect.top + 18}px`;
     const angle = Math.random()*Math.PI*2;
     const dist  = 40 + Math.random()*60;
     const dx = Math.cos(angle)*dist;
@@ -239,7 +238,7 @@ function addStrike(){
 
 // ==================== Funzione AI: verifica risposta ====================
 async function isAnswerCorrectAI(question, userAnswer, correctAnswer) {
-  const apiKey = localStorage.getItem("OPENAI_API_KEY"); // salva la chiave una volta nel browser
+  const apiKey = localStorage.getItem("OPENAI_API_KEY");
   const res = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
     headers: {
@@ -249,15 +248,16 @@ async function isAnswerCorrectAI(question, userAnswer, correctAnswer) {
     body: JSON.stringify({
       model: "gpt-4o-mini",
       messages: [
-        { role: "system", content: "Sei un valutatore di risposte per un gioco di indovinelli. Rispondi solo con 'SI' o 'NO'." },
+        { role: "system", content: "Sei un valutatore di risposte per un gioco di indovinelli. Rispondi solo con SI o NO, niente punti o parole extra." },
         { role: "user", content: `Domanda: ${question}\nRisposta utente: ${userAnswer}\nRisposta corretta: ${correctAnswer}` }
       ],
-      max_tokens: 1,
+      max_tokens: 3,
       temperature: 0
     })
   });
   const data = await res.json();
-  return data.choices?.[0]?.message?.content?.trim().toLowerCase() === "si";
+  const answer = data.choices?.[0]?.message?.content?.trim().toLowerCase() || "";
+  return answer.startsWith("si");
 }
 
 // ==================== Controllo risposta con AI ====================
@@ -300,4 +300,3 @@ answerEl.addEventListener("keydown", e => {
 // ==================== Init ====================
 setHudLevel(0);
 showIndovinello();
-
