@@ -61,7 +61,6 @@ function shuffleArray(array){
   }
   return array;
 }
-
 const shuffledIndovinelli = shuffleArray([...indovinelli]);
 
 // ==================== DOM ====================
@@ -163,7 +162,6 @@ class Particle{
     ctx.fill();
   }
 }
-
 for (let i=0;i<particleCount;i++) particlesArray.push(new Particle());
 
 function animateParticles(){
@@ -181,7 +179,7 @@ window.addEventListener('resize', ()=>{
   canvas.height = window.innerHeight;
 });
 
-// ==================== Wave trigger con colore particelle ====================
+// ==================== Wave trigger ====================
 function triggerWave(color){
   waveEl.style.backgroundColor = color;
   waveEl.classList.remove("wave-show");
@@ -239,18 +237,42 @@ function addStrike(){
   }
 }
 
-// ==================== Controllo risposta ====================
-function checkAnswer(){
+// ==================== Funzione AI: verifica risposta ====================
+async function isAnswerCorrectAI(question, userAnswer, correctAnswer) {
+  const apiKey = localStorage.getItem("OPENAI_API_KEY"); // salva la chiave una volta nel browser
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`
+    },
+    body: JSON.stringify({
+      model: "gpt-4o-mini",
+      messages: [
+        { role: "system", content: "Sei un valutatore di risposte per un gioco di indovinelli. Rispondi solo con 'SI' o 'NO'." },
+        { role: "user", content: `Domanda: ${question}\nRisposta utente: ${userAnswer}\nRisposta corretta: ${correctAnswer}` }
+      ],
+      max_tokens: 1,
+      temperature: 0
+    })
+  });
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content?.trim().toLowerCase() === "si";
+}
+
+// ==================== Controllo risposta con AI ====================
+async function checkAnswer(){
   if (isProcessing) return;
   const userRaw = answerEl.value;
-  const userAns = normalize(userRaw);
-  if (!userAns) return;
+  if (!userRaw.trim()) return;
 
-  const corrAns = normalize(shuffledIndovinelli[current].a);
+  const { q: question, a: correctAnswer } = shuffledIndovinelli[current];
   isProcessing = true;
 
-  if (userAns === corrAns){
-    triggerWave("#00c853"); // verde
+  const isCorrect = await isAnswerCorrectAI(question, userRaw, correctAnswer);
+
+  if (isCorrect) {
+    triggerWave("#00c853");
     addStrike();
     setTimeout(() => {
       current++;
@@ -258,7 +280,7 @@ function checkAnswer(){
       isProcessing = false;
     }, 600);
   } else {
-    triggerWave("#d50000"); // rosso
+    triggerWave("#d50000");
     strikeCount = 0;
     strikeCountEl.textContent = strikeCount;
     setHudLevel(strikeCount);
@@ -278,3 +300,4 @@ answerEl.addEventListener("keydown", e => {
 // ==================== Init ====================
 setHudLevel(0);
 showIndovinello();
+
